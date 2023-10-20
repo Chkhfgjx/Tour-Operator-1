@@ -1,0 +1,135 @@
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TourOperator {
+    private Connection connection;
+    
+    public TourOperator() {
+        // Установка соединения с базой данных
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/tour_operator", "username", "password");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void addTour(Tour tour) {
+        try {
+            String query = "INSERT INTO tours (name, destination, duration, price) VALUES (?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, tour.getName());
+            statement.setString(2, tour.getDestination());
+            statement.setInt(3, tour.getDuration());
+            statement.setDouble(4, tour.getPrice());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public List<Tour> getAllTours() {
+        List<Tour> tours = new ArrayList<>();
+        try {
+            String query = "SELECT * FROM tours";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String destination = resultSet.getString("destination");
+                int duration = resultSet.getInt("duration");
+                double price = resultSet.getDouble("price");
+                Tour tour = new Tour(id, name, destination, duration, price);
+                tours.add(tour);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tours;
+    }
+    
+    public void updateTour(Tour tour) {
+        try {
+            String query = "UPDATE tours SET name = ?, destination = ?, duration = ?, price = ? WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, tour.getName());
+            statement.setString(2, tour.getDestination());
+            statement.setInt(3, tour.getDuration());
+            statement.setDouble(4, tour.getPrice());
+            statement.setInt(5, tour.getId());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void deleteTour(int id) {
+        try {
+            String query = "DELETE FROM tours WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class Tour {
+    private int id;
+    private String name;
+    private String destination;
+    private int duration;
+    private double price;
+    
+    public Tour(int id, String name, String destination, int duration, double price) {
+        this.id = id;
+        this.name = name;
+        this.destination = destination;
+        this.duration = duration;
+        this.price = price;
+    }
+    
+    // геттеры и сеттеры
+    
+    public int getId() {
+        return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getDestination() {
+        return destination;
+    }
+    
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+    
+    public int getDuration() {
+        return duration;
+    }
+    
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+    
+    public double getPrice() {
+        return price;
+    }
+    
+    public void setPrice(double price) {
+        this.price = price;
+    }
+}
